@@ -1,4 +1,4 @@
-![image](https://github.com/arclab-hku/ESVIO/assets/44108932/ba012d6e-397f-4f95-933c-9abafe138d7d)<div align="center">
+<div align="center">
 
 # ESVIO: Event-based Stereo Visual Inertial Odometry
 
