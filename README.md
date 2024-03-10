@@ -43,14 +43,7 @@ ESVIO is published in IEEE RA-L with IROS2023 presentation option. (The PDF is a
   organization={IEEE}
 }
 ~~~
-<!-- ~~~
-@article{PL-EVIO,
-  title={PL-EVIO: Robust Monocular Event-based Visual Inertial Odometry with Point and Line Features},
-  author={Guan, Weipeng and Chen, Peiyu and Xie, Yuhan and Lu, Peng},
-  journal={IEEE Transactions on Automation Science and Engineering},
-  year={2023}
-}
-~~~ -->
+
 If you feel like ESVIO has indeed helped in your current research or work,  a simple star or citation of our works should be the best affirmation for us. :blush: 
 
 ### Our accompanying videos
