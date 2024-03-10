@@ -108,7 +108,7 @@ mkdir -p catkin_ws_dvs/src
 cd catkin_ws_dvs
 catkin config --init --mkdirs --extend /opt/ros/noetic --merge-devel --cmake-args -DCMAKE_BUILD_TYPE=Release
 cd ~/catkin_ws_dvs/src
-git clone https://github.com/arclab-hku/ESVIO
+git clone git@github.com:arclab-hku/ESVIO.git --recursive
 ~~~
 
 You should modifie your `.bashrc` file through `gedit ~/.bashrc`, add the following codes in it:
