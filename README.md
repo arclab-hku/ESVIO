@@ -138,7 +138,7 @@ We have released totally 9 rosbag files for evaluating ESVIO, with the introduct
 For the convenience of the community, we also release the raw results of our methods in the form of rosbag ([link](https://github.com/arclab-hku/Event_based_VO-VIO-SLAM/blob/main/Results_for_comparison.md)). 
 
 #### 3.1.2 Run our examples
-After you have downloaded our bag files, you can now run our example :heart_eyes: .
+After you have downloaded our bag files, you can now run our example:
 * For the ESIO (event+imu) version:
 ~~~
 roslaunch esvio_estimator esio.launch 
