@@ -1,0 +1,16 @@
+<!-- <launch>
+  <node name="EventMessageEditor" pkg="events_repacking_helper" type="EventMessageEditor" output="screen" required="true"
+    args="/home/zhouyi/workspace/dataset/DVS/hkust_HDR/2020-07-14-12-38-42.bag
+          /home/zhouyi/workspace/dataset/DVS/hkust_HDR/hahaha.bag">
+  </node>
+</launch> -->
+
+<launch>
+
+  <node name="EventMessageEditor" pkg="events_repacking_helper" type="EventMessageEditor" output="screen" required="true"
+    args="/home/cpy/Datasets/ECMD/highspeed_all_0627_highway_231_303/highspeed_all_0627_highway_231_303.bag
+          /home/cpy/Datasets/ECMD/highspeed_all_0627_highway_231_303/highspeed_all_0627_highway_231_303_events.bag">
+  </node>
+
+
+</launch>

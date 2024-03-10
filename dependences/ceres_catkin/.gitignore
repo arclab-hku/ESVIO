@@ -1,0 +1,11 @@
+build
+lib
+bin
+dependencies
+ceres_src
+ceres
+docs
+
+# Bloom.
+debian
+obj*

@@ -1,0 +1,227 @@
+%YAML:1.0
+
+#common parameters
+imu_topic: "/imu/data"
+
+event_left_topic: "/davis/left/events"
+event_right_topic: "/davis/right/events"
+
+image_left_topic: "/camera/left/image_mono"
+image_right_topic: "/camera/right/image_mono"
+
+use_stereo: 1   #
+use_stereo_event: 1 #
+
+output_path: "/home/cpy/Datasets/output"
+
+###########################################################################################################################
+
+#camera calibration
+cam_left_calib: "cam0_esvio.yaml"
+cam_right_calib: "cam1_esvio.yaml"
+
+#event calibration
+event_left_calib: "event0_esvio.yaml"
+event_right_calib: "event1_esvio.yaml"
+
+image_width: 1224
+image_height: 1024
+
+event_width: 640
+event_height: 480
+
+
+###########################################################################################################################
+# Transformation between imu and left cam/event
+
+# Extrinsic parameter between IMU and Camera.
+estimate_extrinsic: 1   # 0  Have an accurate extrinsic parameters. We will trust the following imu^R_cam, imu^T_cam, don't change it.
+                        # 1  Have an initial guess about extrinsic parameters. We will optimize around your initial guess.
+                        # 2  Don't know anything about extrinsic parameters. You don't need to give R,T. We will try to calibrate it. Do some rotation movement at beginning.
+#If you choose 0 or 1, you should write down the following matrix.
+#Rotation from left camera frame to imu frame, imu^R_cam . from imu to camera
+
+#### T_cam_imu
+extrinsicRotation: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [0.017248643674008135, -0.9998037138739959, 0.009747718459772736,
+          0.012834636469124028, -0.009526963092989282, -0.999872246379971,
+          0.9997688514842376, 0.017371548520172697, 0.01266779001636642]
+extrinsicTranslation: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: d
+   data: [0.07733078169916466 , -0.016637889364465353, -0.14481844113148515]
+
+# extrinsicRotation: !!opencv-matrix
+#    rows: 3
+#    cols: 3
+#    dt: d
+#    data: [0.01120354, -0.99976045, 0.01880224 ,
+#           0.02184410, -0.01855423, -0.99958920,
+#           0.99969861, 0.01160966, 0.02163100]
+# extrinsicTranslation: !!opencv-matrix
+#    rows: 3
+#    cols: 1
+#    dt: d
+#    data: [0.07737190 , 0.02372785, -0.13049913]
+
+#### Transformation between imu and left cam/event T_event_imu = (T_l_le)^-1 * T_l_i
+extrinsicRotation_event: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [0.01120354, -0.99976045, 0.01880224 ,
+          0.02184410, -0.01855423, -0.99958920,
+          0.99969861, 0.01160966, 0.02163100]
+extrinsicTranslation_event: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: d
+   data: [0.07737190 , 0.02372785, -0.13049913]
+
+T_camera_imu: 1  # whether the input is imu to cam. if yes, T_camera_imu = 1 
+T_event_imu: 1  # whether the input is imu to cam. if yes, T_camera_imu = 1 
+
+
+###########################################################################################################################
+# Transformation between right and left camera, left to right
+Rrl: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [ 0.9996848603766697, 0.0249119561277799, -0.003094248788664189,
+          -0.02491591723946596, 0.9996887710199085, -0.001248264723950675, 
+          0.003062189052730629, 0.001324967393012427, 0.9999944337143146]
+
+Trl: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: d
+   data: [-0.17115419 , 0.00323261, 0.00407665 ]
+
+body_T_cam1: !!opencv-matrix # camera right camera to imu
+   rows: 4
+   cols: 4
+   dt: d
+   data: [0.01444787 ,0.01108843 ,0.99983414 ,0.14200077,   
+          -0.99977872 ,0.01545026 ,0.01427572 ,-0.09149884,   
+          -0.01528940 ,-0.99981915 ,0.01130920 ,-0.01491803,   
+          0.00000000,0.00000000, 0.00000000,1.00000000]
+
+# Rrl: !!opencv-matrix
+#    rows: 3
+#    cols: 3
+#    dt: d
+#    data: [ 0.99968000, 0.02003827, 0.01543954,
+#           -0.02001880, 0.99979861, -0.00141440, 
+#           -0.01546477, 0.00110486, 0.99987980 ] 
+
+# Trl: !!opencv-matrix
+#    rows: 3
+#    cols: 1
+#    dt: d
+#    data: [ -0.17017710 , 0.00146904, 0.00486952 ]
+
+# body_T_cam1: !!opencv-matrix # right event to imu.  R_i_re = (R_l_i)^-1 * R_l_re R_i_re = (R_l_i)^-1 * R_l_re
+#    rows: 4
+#    cols: 4
+#    dt: d
+#    data: [0.02707256 ,0.02020146 ,0.99942932 ,0.12878536,   
+#           -0.99963306 ,0.00144710 ,0.02704883 ,-0.09093984,   
+#           -0.00089984 ,-0.99979489 ,0.02023322 ,0.02630325,   
+#           0.00000000,0.00000000, 0.00000000,1.00000000]
+
+###########################################################################################################################
+# left event to right event. Rrl_event = (R_l_re)^-1 * R_l_le Rrl_event = (R_l_re)^-1 * R_l_le
+Rrl_event: !!opencv-matrix
+   rows: 3
+   cols: 3
+   dt: d
+   data: [ 0.99968000, 0.02003827, 0.01543954,
+          -0.02001880, 0.99979861, -0.00141440, 
+          -0.01546477, 0.00110486, 0.99987980 ] 
+
+Trl_event: !!opencv-matrix
+   rows: 3
+   cols: 1
+   dt: d
+   data: [ -0.17017710 , 0.00146904, 0.00486952 ]
+
+body_T_event1: !!opencv-matrix # right event to imu.  R_i_re = (R_l_i)^-1 * R_l_re R_i_re = (R_l_i)^-1 * R_l_re
+   rows: 4
+   cols: 4
+   dt: d
+   data: [0.02707256 ,0.02020146 ,0.99942932 ,0.12878536,   
+          -0.99963306 ,0.00144710 ,0.02704883 ,-0.09093984,   
+          -0.00089984 ,-0.99979489 ,0.02023322 ,0.02630325,   
+          0.00000000,0.00000000, 0.00000000,1.00000000]
+
+###########################################################################################################################
+#time surface map
+ignore_polarity: 0 #true 1 false 0;
+decay_ms: 20 #20
+median_blur_kernel_size: 0 #1 or 0
+feature_filter_threshold: 0.01
+
+#feature traker paprameters
+TS_LK_threshold: 128.0   # the feature detection is based on the time surface
+max_cnt: 150 #250 #300 #150 #esvio 150 # esio 250            # max feature number in feature tracking event ESVIO用150，ESIO用200
+max_cnt_img: 200 #250                       # max feature number in feature tracking image
+min_dist: 10 #esvio 10 #10            # min distance between two event features 
+min_dist_img: 20 #esvio 20            # min distance between two image features 
+freq: 10      #ESVIO 10 ESIO 20          # frequence (Hz) of publish tracking result. At least 10Hz for good estimation. If set 0, the frequence will be same as raw image 
+F_threshold: 1.0        # ransac threshold (pixel)
+show_track: 1           # publish tracking image as topic
+flow_back: 1            # perform forward and backward optical flow to improve feature tracking accuracy
+equalize: 0             # if image is too dark or light, trun on equalize to find enough features
+fisheye: 0              # if using fisheye, trun on it. A circle mask will be loaded to remove edge noisy points
+Num_of_thread: 4        #number of the threads for the big event data process
+
+# line feature
+MIN_length: 20 #5 #10
+Scale_image: 0.5 #0.8 #0.1 #1.0   #The scale of the image that will be used to find the lines. Range (0..1].
+Do_motion_correction: 1 #whether use motion correction
+
+###########################################################################################################################
+#optimization parameters
+max_solver_time: 0.04  # max solver itration time (ms), to guarantee real time
+max_num_iterations: 8   # max solver itrations, to guarantee real time
+keyframe_parallax: 10.0 # keyframe selection threshold (pixel)
+
+###########################################################################################################################
+#imu parameters       The more accurate parameters you provide, the better performance
+#### seems 0.12 & 0.02 is a better choice compared to 0.1 & 0.05
+acc_n: 0.2 #0.0012655720309610252 #4.4793336127290362e-02 #0.1 #0.2  #4.4793336127290362e-02        # accelerometer measurement noise standard deviation. #0.2   0.04
+gyr_n: 0.05 #0.0007294729852113113 #3.1404034561189407e-03 #0.025 #0.05 #3.1404034561189407e-03        # gyroscope measurement noise standard deviation.     #0.05  0.004
+acc_w: 0.002 #5.6386016813618435e-05 #8.0169405615955990e-04 #0.001 #0.002 #8.0169405615955990e-04        # accelerometer bias random work noise standard deviation.  #0.002
+gyr_w: 4.0e-5 #6.996094830870257e-06 #2.8618210492185127e-05 #2.0e-5 #4.0e-5 #2.8618210492185127e-05       # gyroscope bias random work noise standard deviation.     #4.0e-5
+
+g_norm: 9.80766     # gravity magnitude
+
+###########################################################################################################################
+
+#unsynchronization parameters
+estimate_td: 1                      # online estimate time offset between camera and imu
+td: 0.008392591842193153 #0.00777437                # initial value of time offset. unit: s. readed image clock + td = real image clock (IMU clock)
+
+#rolling shutter parameters
+rolling_shutter: 0                  # 0: global shutter camera, 1: rolling shutter camera
+rolling_shutter_tr: 0               # unit: s. rolling shutter read out time per frame (from data sheet).
+
+###########################################################################################################################
+
+#loop closure parameters
+loop_closure: 1                    # start loop closure
+
+loop_closure_topic: "/camera/left/image_mono"   
+load_previous_pose_graph: 0 #1        # load and reuse previous pose graph; load from 'pose_graph_save_path'
+fast_relocalization: 0             # useful in real-time and large project
+
+#visualization parameters
+save_image: 1                   #  (DEBUG_IMAGE)  
+visualize_imu_forward: 1        # output imu forward propogation to achieve low latency and high frequence results
+visualize_camera_size: 0.4      # size of camera marker in RVIZ
+save_loop_match: 0              # 

@@ -1,0 +1,6 @@
+<launch>
+
+        <node pkg="image_transport" type="republish" name="republish_left" args="compressed in:=/camera_left/image_color raw out:=/camera_left/image_color" />
+        <node pkg="image_transport" type="republish" name="republish_right" args="compressed in:=/camera_right/image_color raw out:=/camera_right/image_color" />
+
+</launch>

@@ -1,0 +1,33 @@
+<launch>
+
+    <arg name="config_path" default = "$(find feature_tracker)/../config/esio/esio.yaml" />
+    <arg name="esvio_path" default = "$(find feature_tracker)/../config/esio/" />
+
+    <!-- stereo event feature -->
+    <node name="stereo_event_tracker" pkg="feature_tracker" type="stereo_event_tracker" output="screen" respawn="true">
+        <param name="config_file" type="string" value="$(arg config_path)" />
+        <param name="esvio_folder" type="string" value="$(arg esvio_path)" />
+    </node>
+
+<!-- *********************************   esvio estimator   *********************************     -->
+    <node name="stereo_esio_estimator" pkg="esvio_estimator" type="stereo_esio_estimator" output="screen" respawn="true">
+       <param name="use_stereo_correction" type="bool" value="true"/>
+       <param name="opt_verbose" type="bool" value="false"/>
+       <param name="config_file" type="string" value="$(arg config_path)" />
+       <param name="esvio_folder" type="string" value="$(arg esvio_path)" />
+    </node>
+
+
+<!-- *********************************   pose graph    *********************************     -->
+
+    <node name="pose_graph" pkg="pose_graph" type="pose_graph" output="screen" respawn="true">
+        <param name="config_file" type="string" value="$(arg config_path)" />
+        <param name="visualization_shift_x" type="int" value="0" />
+        <param name="visualization_shift_y" type="int" value="0" />
+        <param name="skip_cnt" type="int" value="0" />
+        <param name="skip_dis" type="double" value="0" />
+    </node>
+
+    <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find esvio_estimator)/../config/ESIO.rviz" />
+
+</launch>
