@@ -1,4 +1,4 @@
-<div align="center">
+![image](https://github.com/arclab-hku/ESVIO/assets/44108932/ba012d6e-397f-4f95-933c-9abafe138d7d)<div align="center">
 
 # ESVIO: Event-based Stereo Visual Inertial Odometry
 
@@ -17,7 +17,7 @@
 </div>
 
 ### Developers:
-[Peiyu Chen](https://scholar.google.com/citations?hl=zh-CN&user=rYj8xaoAAAAJ),   [Weipeng Guan](https://cpy.github.io/)
+[Peiyu Chen](https://scholar.google.com/citations?hl=zh-CN&user=rYj8xaoAAAAJ),   [Weipeng Guan](https://kwanwaipang.github.io/)
 
 ### Related papers
 ESVIO is published in IEEE RA-L with IROS2023 presentation option. (The PDF is available [here](https://arxiv.org/pdf/2212.13184.pdf)).
