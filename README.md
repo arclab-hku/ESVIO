@@ -114,9 +114,7 @@ git clone git@github.com:arclab-hku/ESVIO.git --recursive
 You should modifie your `.bashrc` file through `gedit ~/.bashrc`, add the following codes in it:
 ~~~
 source ~/catkin_ws_dvs/devel/setup.bash
-
 alias esviobuild='cd ~/catkin_ws_dvs/src && catkin build esvio_estimator feature_tracker pose_graph -DCMAKE_BUILD_TYPE=Release -j8'
-
 ~~~
 
 After that, run the `source ~/.bashrc ` and `esviobuild` command in your terminal.
@@ -174,7 +172,7 @@ catkin build dvxplorer_ros_driver  (if you are using the DVXplorer)
 source ~/catkin_ws_dvs/devel/setup.bash
 ~~~
 
-* Step 4: After source your envoronment, you can open your event camera:
+* Step 4: After source your environment, you can open your event camera:
 ~~~
 roslaunch dvs_renderer davis_mono.launch` (if you are using the DAVIS)
 roslaunch dvs_renderer dvxplorer_mono.launch` (if you are using the DVXplorer)
