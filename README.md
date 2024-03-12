@@ -20,7 +20,7 @@
 [Peiyu Chen](https://scholar.google.com/citations?hl=zh-CN&user=rYj8xaoAAAAJ),   [Weipeng Guan](https://kwanwaipang.github.io/)
 
 ### Related papers
-ESVIO is published in IEEE RA-L with IROS2023 presentation option. (The PDF is available [here](https://arxiv.org/pdf/2212.13184.pdf)).
+ESVIO is published in IEEE RA-L with IROS2023 presentation option. (The IEEE RA-L pdf is available [here](https://ieeexplore.ieee.org/document/10107754) and the arxiv pdf is available [here](https://arxiv.org/pdf/2212.13184.pdf)).
 ~~~
 @article{ESVIO,
   title={ESVIO: Event-based Stereo Visual Inertial Odometry},
