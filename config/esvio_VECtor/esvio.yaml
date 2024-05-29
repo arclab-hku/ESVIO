@@ -144,9 +144,6 @@ equalize: 0             # if image is too dark or light, trun on equalize to fin
 fisheye: 0              # if using fisheye, trun on it. A circle mask will be loaded to remove edge noisy points
 Num_of_thread: 2        #number of the threads for the big event data process
 
-# line feature
-MIN_length: 20 #5 #10
-Scale_image: 0.5 #0.8 #0.1 #1.0   #The scale of the image that will be used to find the lines. Range (0..1].
 Do_motion_correction: 1 #whether use motion correction
 
 ###########################################################################################################################

@@ -20,9 +20,7 @@ sleep 3s
 # gnome-terminal --tab -e 'bash -c "roslaunch esvio_estimator esvio_DSEC.launch;exec bash"'
 # gnome-terminal --tab -e 'bash -c "roslaunch esvio_estimator esio_DSEC.launch;exec bash"'
 
-# gnome-terminal --window -e 'bash -c "rosparam set use_sim_time true;rosbag play --pause -r 0.7 -s 0.0 --clock /home/cpy/Datasets/DSEC/dsec.merged.bag;exec bash"'
-# gnome-terminal --window -e 'bash -c "rosparam set use_sim_time true;rosbag play --pause -r 1.0 -s 0.5 --clock /home/cpy/Datasets/DSEC/dsec.merged.bag;exec bash"'
-# gnome-terminal --window -e 'bash -c "rosbag play --clock --pause -r 1.0 -s 0.0 --clock /home/cpy/Datasets/DSEC/B/dsec.merged.bag;exec bash"'
+# gnome-terminal --window -e 'bash -c "rosparam set use_sim_time true;rosbag play --pause --clock /home/cpy/Datasets/DSEC/dsec.merged.bag;exec bash"''
 
 
 # #################********************* Run hku Dataset ********************************##############
