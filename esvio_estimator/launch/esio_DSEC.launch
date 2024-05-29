@@ -2,9 +2,6 @@
 
     <arg name="config_path" default = "$(find feature_tracker)/../config/esio_DSEC/esio.yaml" />
     <arg name="esvio_path" default = "$(find feature_tracker)/../config/esio_DSEC/" />
-    
-    
-
 
     <!-- stereo event feature -->
     <node name="stereo_event_tracker" pkg="feature_tracker" type="stereo_event_tracker" output="screen" respawn="true">
@@ -14,10 +11,9 @@
 
 
 <!-- *********************************   esvio estimator   *********************************     -->
-    <node name="stereo_esvio_estimator" pkg="esvio_estimator" type="stereo_esvio_estimator" output="screen" respawn="true">
+    <node name="stereo_esio_estimator" pkg="esvio_estimator" type="stereo_esio_estimator" output="screen" launch-prefix="gnome-terminal -x">
        <param name="use_stereo_correction" type="bool" value="true"/>
        <param name="opt_verbose" type="bool" value="false"/>
-
        <param name="config_file" type="string" value="$(arg config_path)" />
        <param name="esvio_folder" type="string" value="$(arg esvio_path)" />
     </node>

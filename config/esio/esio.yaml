@@ -5,8 +5,6 @@ imu_topic: "/davis_left/imu"
 event_left_topic: "/davis_left/events"
 event_right_topic: "/davis_right/events"
 
-use_stereo: 0   
-use_stereo_event: 1 #
 system_mode: 0 # 0 for ESIO, 1 for ESVIO
 
 output_path: "/home/cpy/Datasets/output"

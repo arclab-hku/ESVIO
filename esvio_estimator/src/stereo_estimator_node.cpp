@@ -289,6 +289,9 @@ void process_event_image_imu()
                 double t = imu_msg->header.stamp.toSec();
                 double img_t = img_msg->header.stamp.toSec() + estimator.td;
 
+                // ROS_INFO("processing imu data with stamp %f \n", imu_msg->header.stamp.toSec());
+                // ROS_INFO("processing img data with stamp %f \n", img_msg->header.stamp.toSec());
+
                 if (t <= img_t)
                 { 
                     if (current_time < 0)
@@ -373,8 +376,8 @@ void process_event_image_imu()
                 estimator.setReloFrame(frame_stamp, frame_index, match_points, relo_t, relo_r);
             }
 
-            // ROS_DEBUG("processing vision data with stamp %f \n", event_msg->header.stamp.toSec());
-            // ROS_DEBUG("processing vision data with stamp %f \n", img_msg->header.stamp.toSec());
+            // ROS_INFO("processing img data with stamp %f \n", img_msg->header.stamp.toSec());
+            // ROS_INFO("processing event data with stamp %f \n", event_msg->header.stamp.toSec());
 
             TicToc t_s;
             

@@ -351,7 +351,7 @@ int main(int argc, char **argv)
     ros::NodeHandle n("~");
     ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info);
     
-    readParameters(n);
+    readParameters_event(n);
 
     trackerData.stereo_readIntrinsicParameter(CAM_NAMES);  // get the intrinsic parameter of the camera
 

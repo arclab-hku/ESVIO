@@ -312,7 +312,8 @@ int FeatureManager::Stereo_getEventFeatureCount()
 
 
 bool FeatureManager::stereo_addFeatureCheckParallax(int frame_count, 
-                                             const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &image, 
+                                             const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &image,
+                                             const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &event,  
                                              double td)
 {   
     // ROS_DEBUG("num of image feature: %d", Stereo_getImageFeatureCount());
@@ -323,6 +324,42 @@ bool FeatureManager::stereo_addFeatureCheckParallax(int frame_count,
     last_average_parallax = 0;
     long_track_num = 0; 
     new_feature_num = 0;
+
+    // event feature
+    for (auto &id_pts : event)
+    {
+        Stereo_Event_FeaturePerFrame f_per_fra(id_pts.second[0].second, td);
+        f_per_fra.feat_id = id_pts.first; 
+        if(id_pts.second[0].first != 0)
+            ROS_ERROR("what event? second[0].first = %d", id_pts.second[0].first );
+        assert(id_pts.second[0].first == 0);
+        if(id_pts.second.size() == 2)
+        {
+            f_per_fra.rightObservation(id_pts.second[1].second);
+            assert(id_pts.second[1].first == 1);
+        }
+
+        int feature_id = id_pts.first;
+        auto it = find_if(Stereo_Event_feature.begin(), Stereo_Event_feature.end(), [feature_id](const Stereo_Event_FeaturePerId &it)
+                          {
+            return it.feature_id == feature_id;
+                          });
+
+        if (it == Stereo_Event_feature.end())
+        {
+            Stereo_Event_feature.push_back(Stereo_Event_FeaturePerId(feature_id, frame_count));
+            Stereo_Event_feature.back().Event_feature_per_frame.push_back(f_per_fra);
+            // new_feature_num++;
+        }
+        else if (it->feature_id == feature_id)
+        {
+            it->Event_feature_per_frame.push_back(f_per_fra);
+            // last_track_num++;
+            // if( it-> Event_feature_per_frame.size() >= 4)
+            //     long_track_num++;
+        }
+        
+    }
 
     // image feature
     for (auto &id_pts : image)
@@ -387,8 +424,7 @@ bool FeatureManager::stereo_addFeatureCheckParallax(int frame_count,
     }
 }
 
-bool FeatureManager::ESIO_addFeatureCheckParallax(int frame_count, 
-                                            //  const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &image, 
+bool FeatureManager::ESIO_addFeatureCheckParallax(int frame_count,
                                              const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &event, 
                                              double td)
 {   
@@ -626,6 +662,7 @@ void FeatureManager::clearDepth(const VectorXd &x)
             continue;
         it_per_id.estimated_depth = 1.0 / x(++feature_index);
     }
+
 }
 
 void FeatureManager::Event_clearDepth(const VectorXd &x)
@@ -844,6 +881,7 @@ void FeatureManager::Event_triangulateStereo()
 {
     for (auto &it_per_id : Stereo_Event_feature)
     {   
+        // std::cout<<"Stereo Event Feature" << Stereo_Event_feature.size() << std::endl;
         if (it_per_id.estimated_depth > 0)
             continue;
         double depth = it_per_id.Event_feature_per_frame[0].getDepth();  

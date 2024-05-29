@@ -195,16 +195,15 @@ class FeatureManager
 
     void clearState();
 
-    int getFeatureCount();//统计点特征
     int Stereo_getImageFeatureCount();
     int Stereo_getEventFeatureCount();
     
  
     bool stereo_addFeatureCheckParallax( int frame_count, 
                                   const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &image,
+                                  const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &event,
                                   double td);
     bool ESIO_addFeatureCheckParallax( int frame_count, 
-                                  // const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &image, 
                                   const map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> &event, 
                                   double td);
 
@@ -231,7 +230,6 @@ class FeatureManager
     void Event_triangulateStereo();
     void stereo_triangulate(Vector3d Ps[], Vector3d tic[], Matrix3d ric[]);// for points not be trangulated by stereo，use mono trangulation
     void Stereo_Event_triangulate(Vector3d Ps[], Vector3d tic[], Matrix3d ric[]);
-    void Event_triangulate(Vector3d Ps[], Vector3d tic[], Matrix3d ric[]);
     void removeBackShiftDepth(Eigen::Matrix3d marg_R, Eigen::Vector3d marg_P, Eigen::Matrix3d new_R, Eigen::Vector3d new_P);
     void removeBack();
     void removeFront(int frame_count);

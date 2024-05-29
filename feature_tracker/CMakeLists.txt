@@ -29,7 +29,6 @@ include_directories(
   ${EIGEN3_INCLUDE_DIR}
 )
 
-
 # stereo image feature
 add_executable(stereo_image_tracker
     src/stereo_image_tracker_node.cpp
@@ -48,3 +47,4 @@ add_executable(stereo_event_tracker
     src/utility/visualization.cpp
     )
 target_link_libraries(stereo_event_tracker ${catkin_LIBRARIES} ${OpenCV_LIBS})
+

@@ -165,6 +165,8 @@ void FeatureTracker::trackImage(double _cur_time, const cv::Mat &img_left, const
 {   
     TicToc t_r;
     cur_time = _cur_time;
+    int row = img_left.rows;
+    int col = img_left.cols;
 
     cv::Mat rightImg = img_right;
 

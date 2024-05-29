@@ -6,7 +6,8 @@
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
-  <maintainer email="chenpyhk@connect.hku.hk">dvorak</maintainer>
+  <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
+  <maintainer email="qintonguav@gmail.com">dvorak</maintainer>
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->

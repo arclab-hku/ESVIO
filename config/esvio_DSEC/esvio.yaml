@@ -1,18 +1,14 @@
 %YAML:1.0
 
 #common parameters
-# imu_topic: "/imu/data"
-
+imu_topic: "/imu/data"
 event_left_topic: "/davis/left/events"
 event_right_topic: "/davis/right/events"
-
-imu_topic: "/imu/data"
-
 image_left_topic: "/cam00/image_raw"
 image_right_topic: "/cam01/image_raw"
 
-use_stereo: 1   #
-use_stereo_event: 1 #
+
+system_mode: 1 # 0 for ESIO, 1 for ESVIO
 
 output_path: "/home/cpy/Datasets/output"
 
@@ -48,8 +44,8 @@ extrinsicRotation: !!opencv-matrix
    rows: 3
    cols: 3
    dt: d
-   data: [-0.99973298, -0.00994674, 0.02085725,   
-           0.01003579, -0.99994095, 0.00416910,   
+   data: [-0.99973298, -0.00994674, 0.02085725,  
+           0.01003579, -0.99994095, 0.00416910,  
            0.02081454, 0.00437730, 0.99977377]
 extrinsicTranslation: !!opencv-matrix
    rows: 3
@@ -134,10 +130,10 @@ feature_filter_threshold: 0.01
 
 #feature traker paprameters
 TS_LK_threshold: 128.0   # the feature detection is based on the time surface
-max_cnt: 100            # max feature number in feature tracking event
-max_cnt_img: 150                       # max feature number in feature tracking image
-min_dist: 20 #10            # min distance between two event features 
-min_dist_img: 30 #30            # min distance between two image features 
+max_cnt: 200            # max feature number in feature tracking event
+max_cnt_img: 175                       # max feature number in feature tracking image
+min_dist: 30 #10            # min distance between two event features 
+min_dist_img: 40 #30            # min distance between two image features 
 freq: 10                # frequence (Hz) of publish tracking result. At least 10Hz for good estimation. If set 0, the frequence will be same as raw image 
 F_threshold: 1.0        # ransac threshold (pixel)
 show_track: 1           # publish tracking image as topic
@@ -146,9 +142,6 @@ equalize: 0             # if image is too dark or light, trun on equalize to fin
 fisheye: 0              # if using fisheye, trun on it. A circle mask will be loaded to remove edge noisy points
 Num_of_thread: 2        #number of the threads for the big event data process
 
-# line feature
-MIN_length: 20 #5 #10
-Scale_image: 0.5 #0.8 #0.1 #1.0   #The scale of the image that will be used to find the lines. Range (0..1].
 Do_motion_correction: 0 #whether use motion correction
 
 ###########################################################################################################################
@@ -168,8 +161,8 @@ g_norm: 9.80766     # gravity magnitude
 ###########################################################################################################################
 
 #unsynchronization parameters
-estimate_td: 1                      # online estimate time offset between camera and imu
-td: 0.0 #0.00777437                # initial value of time offset. unit: s. readed image clock + td = real image clock (IMU clock)
+estimate_td: 0                      # online estimate time offset between camera and imu
+td: 0.0                # initial value of time offset. unit: s. readed image clock + td = real image clock (IMU clock)
 
 #rolling shutter parameters
 rolling_shutter: 0                  # 0: global shutter camera, 1: rolling shutter camera

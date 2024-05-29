@@ -9,8 +9,8 @@ event_right_topic: "/davis/right/events"
 image_left_topic: "/camera/left/image_mono"
 image_right_topic: "/camera/right/image_mono"
 
-use_stereo: 1   #
-use_stereo_event: 1 #
+
+system_mode: 1 # 0 for ESIO, 1 for ESVIO
 
 output_path: "/home/cpy/Datasets/output"
 

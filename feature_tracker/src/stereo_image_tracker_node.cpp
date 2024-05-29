@@ -223,15 +223,15 @@ void sync_process()
                 double time_right = img_right_buf.front()->header.stamp.toSec();
                 msg_timestamp = time_left;
 
-                if(time_left <= time_right - 0.5)// tolerance
+                if(time_left <= time_right - 1)// tolerance
                 {
                     img_left_buf.pop();
-                    // printf("throw img_left\n");
+                    printf("throw img_left\n");
                 }
-                else if(time_left > time_right + 0.5)
+                else if(time_left > time_right + 1)
                 {
                     img_right_buf.pop();
-                    // printf("throw img_right\n");
+                    printf("throw img_right\n");
                 }
                 else
                 {

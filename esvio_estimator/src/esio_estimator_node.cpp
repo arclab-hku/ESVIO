@@ -19,6 +19,7 @@ std::condition_variable con;
 double current_time = -1;
 queue<sensor_msgs::ImuConstPtr> imu_buf;
 queue<sensor_msgs::PointCloudConstPtr> eventfeature_buf;
+queue<sensor_msgs::PointCloudConstPtr> imagefeature_buf;
 queue<sensor_msgs::PointCloudConstPtr> relo_buf;
 int sum_of_wait = 0;
 
@@ -110,27 +111,32 @@ void update()
 
 }
 
-std::vector<std::pair<std::vector<sensor_msgs::ImuConstPtr>, sensor_msgs::PointCloudConstPtr > > 
-getMeasurements_event_imu()
+
+std::vector<std::pair<std::vector<sensor_msgs::ImuConstPtr>,
+                std::pair<sensor_msgs::PointCloudConstPtr, sensor_msgs::PointCloudConstPtr> > > 
+getMeasurements_event_image_imu()
 {
-    std::vector<std::pair<std::vector<sensor_msgs::ImuConstPtr>, sensor_msgs::PointCloudConstPtr > > measurements;
+    std::vector<std::pair<std::vector<sensor_msgs::ImuConstPtr>,
+                std::pair<sensor_msgs::PointCloudConstPtr, sensor_msgs::PointCloudConstPtr> > > measurements;
 
     while (true)
     {
-        if (imu_buf.empty() || eventfeature_buf.empty())
+        if (imu_buf.empty() || imagefeature_buf.empty())
             return measurements;
 
-        if (!(imu_buf.back()->header.stamp.toSec() > eventfeature_buf.front()->header.stamp.toSec() + estimator.td))
+        if (!(imu_buf.back()->header.stamp.toSec() > imagefeature_buf.front()->header.stamp.toSec() + estimator.td))
         {
             sum_of_wait++;
             return measurements;
         }
 
-        if (!(imu_buf.front()->header.stamp.toSec() < eventfeature_buf.front()->header.stamp.toSec() + estimator.td))
+        if (!(imu_buf.front()->header.stamp.toSec() < imagefeature_buf.front()->header.stamp.toSec() + estimator.td))
         {
-            ROS_WARN("throw img, only should happen at the beginning");
+            ROS_WARN("throw event and img, only should happen at the beginning");
             if(eventfeature_buf.size()!=0)
                 eventfeature_buf.pop();
+            if(imagefeature_buf.size()!=0)
+                imagefeature_buf.pop();
             continue;
         } 
 
@@ -139,9 +145,16 @@ getMeasurements_event_imu()
             event_msg = eventfeature_buf.front();
             eventfeature_buf.pop();
         }
-             
+
+        sensor_msgs::PointCloudConstPtr image_msg;
+        if(imagefeature_buf.size()!=0){
+            image_msg = imagefeature_buf.front();
+            imagefeature_buf.pop();
+        }
+       
+        
         std::vector<sensor_msgs::ImuConstPtr> IMUs;
-        while (imu_buf.front()->header.stamp.toSec() < event_msg->header.stamp.toSec() + estimator.td)
+        while (imu_buf.front()->header.stamp.toSec() < image_msg->header.stamp.toSec() + estimator.td)
         {
             IMUs.emplace_back(imu_buf.front());
             imu_buf.pop();
@@ -149,9 +162,9 @@ getMeasurements_event_imu()
 
         IMUs.emplace_back(imu_buf.front());
         if (IMUs.empty())
-            ROS_WARN("no imu between two image");
+            ROS_WARN("no imu between two events");
 
-        measurements.emplace_back(IMUs, event_msg);
+        measurements.emplace_back(IMUs, std::make_pair(image_msg, event_msg));
     }
     return measurements;
 }
@@ -179,13 +192,30 @@ void imu_callback(const sensor_msgs::ImuConstPtr &imu_msg)
         std_msgs::Header header = imu_msg->header;
         header.frame_id = "world";
         if (estimator.solver_flag == Estimator::SolverFlag::NON_LINEAR){
-            pubLatestOdometry(tmp_P, tmp_Q, tmp_V, header);
+            pubLatestOdometry(tmp_P, tmp_Q, tmp_V, header);//IMU-rate update
         }
     }
+
+
 }
 
 
 void stereo_eventfeature_callback(const sensor_msgs::PointCloudConstPtr &feature_msg)
+{
+    if (!init_event)
+    {
+        init_event = 1;
+        return;
+    }
+        m_buf.lock();
+        eventfeature_buf.push(feature_msg);
+        m_buf.unlock();
+        con.notify_one();
+    // ROS_INFO("no enough event feature, please move the camera");
+}
+
+
+void stereo_imagefeature_callback(const sensor_msgs::PointCloudConstPtr &feature_msg)
 {
     if (!init_image)
     {
@@ -193,7 +223,7 @@ void stereo_eventfeature_callback(const sensor_msgs::PointCloudConstPtr &feature
         return;
     }
     m_buf.lock();
-    eventfeature_buf.push(feature_msg);
+    imagefeature_buf.push(feature_msg);
     m_buf.unlock();
     con.notify_one();
 }
@@ -208,6 +238,8 @@ void restart_callback(const std_msgs::BoolConstPtr &restart_msg)
             eventfeature_buf.pop();
         while(!imu_buf.empty())
             imu_buf.pop();
+        while(!imagefeature_buf.empty())
+            imagefeature_buf.pop();
         m_buf.unlock();
         m_estimator.lock();
         estimator.clearState();
@@ -227,32 +259,38 @@ void relocalization_callback(const sensor_msgs::PointCloudConstPtr &points_msg)
     m_buf.unlock();
 }
 
+
 void process_event_imu()
 {
     while (true)
     {
-        std::vector<std::pair<std::vector<sensor_msgs::ImuConstPtr>, sensor_msgs::PointCloudConstPtr > > measurements; //ESIO version
+        std::vector<std::pair<std::vector<sensor_msgs::ImuConstPtr>,
+                std::pair<sensor_msgs::PointCloudConstPtr, sensor_msgs::PointCloudConstPtr> > > measurements; 
 
         std::unique_lock<std::mutex> lk(m_buf);
         con.wait(lk, [&]
                  {
-            return (measurements = getMeasurements_event_imu()).size() != 0;
+            return (measurements = getMeasurements_event_image_imu()).size() != 0;
                  });
         lk.unlock();
 
         m_estimator.lock();
         for (auto &measurement : measurements) 
         {
-
-            auto event_msg = measurement.second;
+            auto img_msg = measurement.second.first;//image feature point
+            auto event_msg = measurement.second.second;//event feature point
       
-            // ROS_INFO("The number of the event:%d",event_msg->points.size());
+            // ROS_INFO("The number of the event point:%d",event_msg->points.size());
+            // ROS_INFO("The number of the image point:%d",img_msg->points.size());
 
             double dx = 0, dy = 0, dz = 0, rx = 0, ry = 0, rz = 0;
             for (auto &imu_msg : measurement.first)
             {
                 double t = imu_msg->header.stamp.toSec();
-                double img_t = event_msg->header.stamp.toSec() + estimator.td;
+                double img_t = img_msg->header.stamp.toSec() + estimator.td;
+
+                // ROS_INFO("processing imu data with stamp %f \n", imu_msg->header.stamp.toSec());
+                // ROS_INFO("processing img data with stamp %f \n", img_msg->header.stamp.toSec());
 
                 if (t <= img_t)
                 { 
@@ -338,7 +376,8 @@ void process_event_imu()
                 estimator.setReloFrame(frame_stamp, frame_index, match_points, relo_t, relo_r);
             }
 
-            ROS_DEBUG("processing vision data with stamp %f \n", event_msg->header.stamp.toSec());
+            // ROS_INFO("processing img data with stamp %f \n", img_msg->header.stamp.toSec());
+            // ROS_INFO("processing event data with stamp %f \n", event_msg->header.stamp.toSec());
 
             TicToc t_s;
             
@@ -363,13 +402,35 @@ void process_event_imu()
                 }
             }
 
+            map<int, vector<pair<int, Eigen::Matrix<double, 7, 1>>>> image;
+            if(img_msg!=NULL){
+                for (unsigned int i = 0; i < img_msg->points.size(); i++)
+                {
+                    int v = img_msg->channels[0].values[i] + 0.5;
+                    int feature_id = v / NUM_OF_CAM_stereo;
+                    int camera_id = v % NUM_OF_CAM_stereo;
+                    double x = img_msg->points[i].x;
+                    double y = img_msg->points[i].y;
+                    double z = img_msg->points[i].z;
+                    double p_u = img_msg->channels[1].values[i];
+                    double p_v = img_msg->channels[2].values[i];
+                    double velocity_x = img_msg->channels[3].values[i];
+                    double velocity_y = img_msg->channels[4].values[i];
+                    ROS_ASSERT(z == 1);
+                    Eigen::Matrix<double, 7, 1> xyz_uv_velocity;
+                    xyz_uv_velocity << x, y, z, p_u, p_v, velocity_x, velocity_y;
+                    image[feature_id].emplace_back(camera_id,  xyz_uv_velocity);
+                }
+            }
+
             // ROS_INFO("The number of the event point:%d",event_msg->points.size());
+            // ROS_INFO("The number of the image point:%d",img_msg->points.size());
             
-            estimator.Stereo_processEvent(event, event_msg->header);
+            estimator.Stereo_processVisual(image, event, img_msg->header);
 
             double whole_t = t_s.toc();
             printStatistics(estimator, whole_t);
-            std_msgs::Header header = event_msg->header;
+            std_msgs::Header header = img_msg->header;
             header.frame_id = "world";
 
             pubOdometry(estimator, header);
@@ -395,7 +456,7 @@ void process_event_imu()
 
 int main(int argc, char **argv)
 {
-    ros::init(argc, argv, "stereo_esvio_estimator");
+    ros::init(argc, argv, "stereo_esio_estimator");
     ros::NodeHandle n("~");
     ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Info);
     readParameters(n);
@@ -405,15 +466,15 @@ int main(int argc, char **argv)
 #ifdef EIGEN_DONT_PARALLELIZE
     ROS_DEBUG("EIGEN_DONT_PARALLELIZE");
 #endif
-    ROS_WARN("waiting for image and imu...");
+    ROS_WARN("waiting for event and imu...");
 
     registerPub(n);
 
     ros::Subscriber sub_imu = n.subscribe(IMU_TOPIC, 2000, imu_callback, ros::TransportHints().tcpNoDelay());
-    ros::Subscriber sub_eventfeature = n.subscribe("/stereo_event_tracker/feature", 2000, stereo_eventfeature_callback);//ESIO
+    ros::Subscriber sub_imagefeature = n.subscribe("/stereo_event_tracker/feature", 2000, stereo_imagefeature_callback);//event node
     ros::Subscriber sub_relo_points = n.subscribe("/pose_graph/match_points", 2000, relocalization_callback);
 
-    std::thread measurement_process{process_event_imu};//esio
+    std::thread measurement_process{process_event_imu};
     ros::spin();
 
     return 0;

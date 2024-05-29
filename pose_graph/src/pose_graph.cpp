@@ -335,7 +335,7 @@ int PoseGraph::detectLoop(KeyFrame* keyframe, int frame_index)
     if (DEBUG_IMAGE)
     {
         int feature_num = keyframe->keypoints.size();// num of features
-        cv::resize(keyframe->image, compressed_image, cv::Size(376, 240));
+        cv::resize(keyframe->image, compressed_image, cv::Size(346, 240));
         putText(compressed_image, "feature_num:" + to_string(feature_num), cv::Point2f(10, 10), cv::FONT_HERSHEY_SIMPLEX, 0.4, cv::Scalar(255));
         image_pool[frame_index] = compressed_image;
     }

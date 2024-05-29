@@ -207,7 +207,7 @@ void Estimator::Stereo_processVisual(const map<int, vector<pair<int, Eigen::Matr
 {
     ROS_DEBUG("new event coming ------------------------------------------");
     ROS_DEBUG("Adding event points %lu, image points %lu", event.size(), image.size());
-    if (f_manager.stereo_addFeatureCheckParallax(frame_count, image, td))// parallax check
+    if (f_manager.stereo_addFeatureCheckParallax(frame_count, image, event, td))// parallax check
         marginalization_flag = MARGIN_OLD;
     else
         marginalization_flag = MARGIN_SECOND_NEW;
@@ -250,13 +250,14 @@ void Estimator::Stereo_processVisual(const map<int, vector<pair<int, Eigen::Matr
             {
 
                 result = initialStructureStereo();
-                // if(!result)
-                //    {result = initialStructure();}//mono part
+                if(!result)
+                   {result = initialStructure();}//mono part
 
                 initial_timestamp = header.stamp.toSec();
             }
             if(result)
             {
+                // cout<<"initialStructureStereo success"<<endl;
                 solver_flag = NON_LINEAR;
 
                 solveOdometry_esvio();  // optimization esvio
@@ -354,8 +355,8 @@ void Estimator::Stereo_processEvent(const map<int, vector<pair<int, Eigen::Matri
             {
 
                 result = ESIO_initialStructureStereo();
-                // if(!result)
-                //    {result = ESIO_initialStructure();}//mono ini
+                if(!result)
+                   {result = ESIO_initialStructure();}//mono ini
 
                 initial_timestamp = header.stamp.toSec();
             }
@@ -437,7 +438,7 @@ bool Estimator::initialStructure()
         //ROS_WARN("IMU variation %f!", var);
         if(var < 0.25)
         {
-            ROS_INFO("IMU excitation not enough!");
+            ROS_INFO("evio IMU excitation not enough!");
         }
     }
     // global sfm
@@ -464,7 +465,7 @@ bool Estimator::initialStructure()
     int l;
     if (!relativePose(relative_R, relative_T, l))
     {
-        ROS_INFO("Not enough features or parallax; Move device around");
+        ROS_INFO("evio Not enough features or parallax; Move device around");
         return false;
     }
     GlobalSFM sfm;
@@ -472,11 +473,12 @@ bool Estimator::initialStructure()
               relative_R, relative_T,
               sfm_f, sfm_tracked_points))
     {
-        ROS_DEBUG("global SFM failed!");
+        ROS_INFO("global SFM failed!");
         marginalization_flag = MARGIN_OLD;
         return false;
     }
-
+    
+    ROS_INFO("global SFM success!");
     //solve pnp for all frame 3D-2D
     map<double, ImageFrame>::iterator frame_it;
     map<int, Vector3d>::iterator it;
@@ -527,12 +529,12 @@ bool Estimator::initialStructure()
         if(pts_3_vector.size() < 6)
         {
             cout << "pts_3_vector size " << pts_3_vector.size() << endl;
-            ROS_DEBUG("Not enough points for solve pnp !");
+            ROS_INFO("Not enough points for solve pnp !");
             return false;
         }
         if (! cv::solvePnP(pts_3_vector, pts_2_vector, K, D, rvec, t, 1))
         {
-            ROS_DEBUG("solve pnp fail!");
+            ROS_INFO("solve pnp fail!");
             return false;
         }
         cv::Rodrigues(rvec, r);
@@ -581,7 +583,7 @@ bool Estimator::ESIO_initialStructure()
         //ROS_WARN("IMU variation %f!", var);
         if(var < 0.25)
         {
-            ROS_INFO("IMU excitation not enough!");
+            ROS_INFO("eio IMU excitation not enough!");
         }
     }
     // global sfm
@@ -608,7 +610,7 @@ bool Estimator::ESIO_initialStructure()
     int l;
     if (!relativePose(relative_R, relative_T, l))
     {
-        ROS_INFO("Not enough features or parallax; Move device around");
+        ROS_INFO("eio Not enough features or parallax; Move device around");
         return false;
     }
     GlobalSFM sfm;
@@ -728,7 +730,7 @@ bool Estimator::initialStructureStereo()
         //ROS_WARN("IMU variation %f!", var);
         if(var < 0.25)
         {
-            ROS_INFO("IMU excitation not enouth!");
+            ROS_INFO("esvio IMU excitation not enouth!");
         }
     }
     // global sfm
@@ -757,7 +759,7 @@ bool Estimator::initialStructureStereo()
 
     if(!relativePoseHybrid(relative_R, relative_T, l))
     {
-        ROS_INFO("Not enough features or parallax; Move device around");
+        ROS_INFO("esvio Not enough features or parallax; Move device around");
         return false;
     }
 
@@ -909,7 +911,7 @@ bool Estimator::ESIO_initialStructureStereo()
 
     if(!Event_relativePoseHybrid(relative_R, relative_T, l))
     {
-        ROS_INFO("Not enough features or parallax; Move device around");
+        ROS_INFO("esio Not enough features or parallax; Move device around");
         return false;
     }
 
@@ -1367,6 +1369,7 @@ bool Estimator::relativePose(Matrix3d &relative_R, Vector3d &relative_T, int &l)
         vector<pair<Vector3d, Vector3d>> corres;
         corres = f_manager.getCorresponding(i, WINDOW_SIZE);
         // corres = f_manager.getCorrespondingWithDepth(i, WINDOW_SIZE);
+        // cout<<"corres size: "<<corres.size()<<endl;
         if (corres.size() > 20)
         {
             double sum_parallax = 0;
@@ -1379,12 +1382,15 @@ bool Estimator::relativePose(Matrix3d &relative_R, Vector3d &relative_T, int &l)
                 sum_parallax = sum_parallax + parallax;
 
             }
+            // cout<<"sum_parallax: "<<sum_parallax<<endl;
+            // cout<<"corres.size(): "<<corres.size()<<endl;
             average_parallax = 1.0 * sum_parallax / int(corres.size());
+            // cout<<"average_parallax: "<<average_parallax <<endl;
             if(average_parallax * 460 > 30 && m_estimator.solveRelativeRT(corres, relative_R, relative_T))
             // if(average_parallax * 460 > 30 && m_estimator.solveRelativeHybrid(corres, relative_R, relative_T))
             {
                 l = i;
-                ROS_DEBUG("average_parallax %f choose l %d and newest frame to triangulate the whole structure", average_parallax * 460, l);
+                ROS_INFO("average_parallax %f choose l %d and newest frame to triangulate the whole structure", average_parallax * 460, l);
                 return true;
             }
         }
@@ -1412,7 +1418,7 @@ bool Estimator::relativePoseHybrid(Matrix3d &relative_R, Vector3d &relative_T, i
 
             }
             average_parallax = 1.0 * sum_parallax / int(corres.size());
-            //if(average_parallax * 460 > 30 && m_estimator.solveRelativeHybrid(corres, relative_R, relative_T))
+            // if(average_parallax * 460 > 30 && m_estimator.solveRelativeHybrid(corres, relative_R, relative_T))
             if(average_parallax * 460 > 30 && m_estimator.solveRelativeHybrid(corres, relative_R, relative_T))
             {
                 l = i;
