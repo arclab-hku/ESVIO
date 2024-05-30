@@ -130,7 +130,7 @@ feature_filter_threshold: 0.01
 
 #feature traker paprameters
 TS_LK_threshold: 128.0   # the feature detection is based on the time surface
-max_cnt: 200            # max feature number in feature tracking event
+max_cnt: 100            # max feature number in feature tracking event
 max_cnt_img: 175                       # max feature number in feature tracking image
 min_dist: 30 #10            # min distance between two event features 
 min_dist_img: 40 #30            # min distance between two image features 

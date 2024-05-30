@@ -54,26 +54,26 @@ void predict(const sensor_msgs::ImuConstPtr &imu_msg)
     latest_time = t;
 
     // get acc, normal version
-    // double dx = imu_msg->linear_acceleration.x;
-    // double dy = imu_msg->linear_acceleration.y;
-    // double dz = imu_msg->linear_acceleration.z;
+    double dx = imu_msg->linear_acceleration.x;
+    double dy = imu_msg->linear_acceleration.y;
+    double dz = imu_msg->linear_acceleration.z;
   
     // flight version
-    double dx = imu_msg->linear_acceleration.z;
-    double dy = -imu_msg->linear_acceleration.x;
-    double dz = -imu_msg->linear_acceleration.y;
+    // double dx = imu_msg->linear_acceleration.z;
+    // double dy = -imu_msg->linear_acceleration.x;
+    // double dz = -imu_msg->linear_acceleration.y;
     Eigen::Vector3d linear_acceleration{dx, dy, dz};
 
     // get gyr, normal version
-    // double rx = imu_msg->angular_velocity.x;
-    // double ry = imu_msg->angular_velocity.y;
-    // double rz = imu_msg->angular_velocity.z;
+    double rx = imu_msg->angular_velocity.x;
+    double ry = imu_msg->angular_velocity.y;
+    double rz = imu_msg->angular_velocity.z;
 
     // flight version
 
-    double rx = imu_msg->angular_velocity.z;
-    double ry = -imu_msg->angular_velocity.x;
-    double rz = -imu_msg->angular_velocity.y;
+    // double rx = imu_msg->angular_velocity.z;
+    // double ry = -imu_msg->angular_velocity.x;
+    // double rz = -imu_msg->angular_velocity.y;
     Eigen::Vector3d angular_velocity{rx, ry, rz};
 
     Eigen::Vector3d un_acc_0 = tmp_Q * (acc_0 - tmp_Ba) - estimator.g; 
@@ -300,20 +300,20 @@ void process_event_imu()
                     ROS_ASSERT(dt >= 0);
                     current_time = t;
                     // normal version
-                    // dx = imu_msg->linear_acceleration.x;
-                    // dy = imu_msg->linear_acceleration.y;
-                    // dz = imu_msg->linear_acceleration.z;
-                    // rx = imu_msg->angular_velocity.x;
-                    // ry = imu_msg->angular_velocity.y;
-                    // rz = imu_msg->angular_velocity.z;
+                    dx = imu_msg->linear_acceleration.x;
+                    dy = imu_msg->linear_acceleration.y;
+                    dz = imu_msg->linear_acceleration.z;
+                    rx = imu_msg->angular_velocity.x;
+                    ry = imu_msg->angular_velocity.y;
+                    rz = imu_msg->angular_velocity.z;
 
                     // flight version
-                    dx = imu_msg->linear_acceleration.z;
-                    dy = -imu_msg->linear_acceleration.x;
-                    dz = -imu_msg->linear_acceleration.y;
-                    rx = imu_msg->angular_velocity.z;
-                    ry = -imu_msg->angular_velocity.x;
-                    rz = -imu_msg->angular_velocity.y;
+                    // dx = imu_msg->linear_acceleration.z;
+                    // dy = -imu_msg->linear_acceleration.x;
+                    // dz = -imu_msg->linear_acceleration.y;
+                    // rx = imu_msg->angular_velocity.z;
+                    // ry = -imu_msg->angular_velocity.x;
+                    // rz = -imu_msg->angular_velocity.y;
 
                     estimator.processIMU(dt, Vector3d(dx, dy, dz), Vector3d(rx, ry, rz));
                     //printf("imu: dt:%f a: %f %f %f w: %f %f %f\n",dt, dx, dy, dz, rx, ry, rz);
@@ -330,20 +330,20 @@ void process_event_imu()
                     double w1 = dt_2 / (dt_1 + dt_2);
                     double w2 = dt_1 / (dt_1 + dt_2);
                     // normal version
-                    // dx = w1 * dx + w2 * imu_msg->linear_acceleration.x;
-                    // dy = w1 * dy + w2 * imu_msg->linear_acceleration.y;
-                    // dz = w1 * dz + w2 * imu_msg->linear_acceleration.z;
-                    // rx = w1 * rx + w2 * imu_msg->angular_velocity.x;
-                    // ry = w1 * ry + w2 * imu_msg->angular_velocity.y;
-                    // rz = w1 * rz + w2 * imu_msg->angular_velocity.z;
+                    dx = w1 * dx + w2 * imu_msg->linear_acceleration.x;
+                    dy = w1 * dy + w2 * imu_msg->linear_acceleration.y;
+                    dz = w1 * dz + w2 * imu_msg->linear_acceleration.z;
+                    rx = w1 * rx + w2 * imu_msg->angular_velocity.x;
+                    ry = w1 * ry + w2 * imu_msg->angular_velocity.y;
+                    rz = w1 * rz + w2 * imu_msg->angular_velocity.z;
 
                     // flight version
-                    dx = w1 * dx + w2 * imu_msg->linear_acceleration.z;
-                    dy = w1 * dy + w2 * -imu_msg->linear_acceleration.x;
-                    dz = w1 * dz + w2 * -imu_msg->linear_acceleration.y;
-                    rx = w1 * rx + w2 * imu_msg->angular_velocity.z;
-                    ry = w1 * ry + w2 * -imu_msg->angular_velocity.x;
-                    rz = w1 * rz + w2 * -imu_msg->angular_velocity.y;
+                    // dx = w1 * dx + w2 * imu_msg->linear_acceleration.z;
+                    // dy = w1 * dy + w2 * -imu_msg->linear_acceleration.x;
+                    // dz = w1 * dz + w2 * -imu_msg->linear_acceleration.y;
+                    // rx = w1 * rx + w2 * imu_msg->angular_velocity.z;
+                    // ry = w1 * ry + w2 * -imu_msg->angular_velocity.x;
+                    // rz = w1 * rz + w2 * -imu_msg->angular_velocity.y;
                     estimator.processIMU(dt_1, Vector3d(dx, dy, dz), Vector3d(rx, ry, rz));
                     //printf("dimu: dt:%f a: %f %f %f w: %f %f %f\n",dt_1, dx, dy, dz, rx, ry, rz);
                 }

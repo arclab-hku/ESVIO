@@ -17,19 +17,19 @@ sleep 3s
 
 
 # #################********************* Run on DSEC Datasets ********************************##############
-# gnome-terminal --tab -e 'bash -c "roslaunch esvio_estimator esvio_DSEC.launch;exec bash"'
+gnome-terminal --tab -e 'bash -c "roslaunch esvio_estimator esvio_DSEC.launch;exec bash"'
 # gnome-terminal --tab -e 'bash -c "roslaunch esvio_estimator esio_DSEC.launch;exec bash"'
 
-# gnome-terminal --window -e 'bash -c "rosparam set use_sim_time true;rosbag play --pause --clock /home/cpy/Datasets/DSEC/dsec.merged.bag;exec bash"''
+gnome-terminal --window -e 'bash -c "rosparam set use_sim_time true;rosbag play --pause --clock /home/cpy/Datasets/DSEC/dsec.merged.bag;exec bash"'
 
 
 # #################********************* Run hku Dataset ********************************##############
 # gnome-terminal --tab -e 'bash -c "roslaunch esvio_estimator stereo_davis_open.launch"'
 # gnome-terminal --tab -e 'bash -c "roslaunch esvio_estimator esvio.launch;exec bash"'
-gnome-terminal --tab -e 'bash -c "roslaunch esvio_estimator esio.launch;exec bash"'
+# gnome-terminal --tab -e 'bash -c "roslaunch esvio_estimator esio.launch;exec bash"'
 
 # gnome-terminal --window -e 'bash -c "rosbag play --clock --pause /home/cpy/Datasets/ESVIO/HKU_aggressive_translation.bag;exec bash"'
-gnome-terminal --window -e 'bash -c "rosbag play --clock --pause /home/cpy/Datasets/ESVIO/HKU_HDR_circle.bag;exec bash"'
+# gnome-terminal --window -e 'bash -c "rosbag play --clock --pause /home/cpy/Datasets/ESVIO/HKU_HDR_circle.bag;exec bash"'
  
 # #################********************* Run on VECtor Dataset ********************************##############
 # gnome-terminal --tab -e 'bash -c "roslaunch esvio_estimator esvio_VECtor.launch;exec bash"'
