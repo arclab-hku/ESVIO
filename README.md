@@ -14,7 +14,8 @@
 <div align="center">
 <!--     <img src="https://github.com/arclab-hku/Event_based_VO-VIO-SLAM/blob/main/ESVIO/ESVIO_hdr_flight_gif.gif" width = 80% > -->
     <a href="https://kwanwaipang.github.io/ESVIO/" target="_blank"><img src="https://github.com/arclab-hku/Event_based_VO-VIO-SLAM/blob/main/ESVIO/ESVIO_hdr_flight_gif.gif" width="80%" /></a>
-    <p>Onboard Quadrotor Flight using Our ESVIO as State Estimator in HDR Scenarios  (click the gif to open the project website)</p>
+    <p>Onboard Quadrotor Flight using Our ESVIO as State Estimator in HDR Scenarios</p>
+    <p>(click the gif to open the project website)</p>
 </div>
 
 ### Developers:
